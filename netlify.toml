@@ -1,0 +1,50 @@
+# netlify.toml
+# Drop this at the repo root. Works for a plain HTML site or a Vite build.
+# For a static single HTML file, leave the build command empty and set publish to "."
+
+[build]
+  publish = "dist"
+    command = "npm run build"
+
+    # Static single file sites use this instead. Comment out the block above.
+    # [build]
+    #   publish = "."
+
+    [build.environment]
+      NODE_VERSION = "20"
+
+      # SPA fallback so deep links do not 404
+      [[redirects]]
+        from = "/*"
+          to = "/index.html"
+            status = 200
+
+            # Force the canonical host. Replace with your real domain once it is bought.
+            # [[redirects]]
+            #   from = "https://www.example.com/*"
+            #   to = "https://example.com/:splat"
+            #   status = 301
+            #   force = true
+
+            [[headers]]
+              for = "/*"
+                [headers.values]
+                    X-Frame-Options = "SAMEORIGIN"
+                        X-Content-Type-Options = "nosniff"
+                            Referrer-Policy = "strict-origin-when-cross-origin"
+                                Permissions-Policy = "geolocation=(self), camera=(), microphone=()"
+
+                                [[headers]]
+                                  for = "/assets/*"
+                                    [headers.values]
+                                        Cache-Control = "public, max-age=31536000, immutable"
+
+                                        [[headers]]
+                                          for = "/*.html"
+                                            [headers.values]
+                                                Cache-Control = "public, max-age=0, must-revalidate"
+
+                                                [context.production.environment]
+                                                  NODE_ENV = "production"
+
+                                                    NODE_ENV = "production"
